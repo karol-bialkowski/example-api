@@ -46,8 +46,9 @@ class Product extends Model
      * @param string $currency
      * @return Currency|null
      */
-    public function getPrice($currency = Pln::class): ?Currency
+    public function getPrice($currency = Pln::class)
     {
+
         $price = $this->hasMany(ProductPrice::class, 'product_id', 'id')
             ->where('active', true)->first();
 

@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Exceptions\ProductException;
 use App\Http\Requests\ApiCreateProductRequest;
+use App\Money\Currency\Pln;
 use App\Product;
 use App\ProductPrice;
 use DB;
@@ -108,13 +109,17 @@ class ProductService extends Product
      * @param int $products_per_page
      * @return mixed
      */
-    public static function getLastProducts($limit = 5, $products_per_page = 3)
+    public static function getLastProducts($limit = 5, $products_per_page = 3, $currency_class = Pln::class)
     {
         $lastProducts = Product::select(['products.*'])
-            ->with(['getPrices'])
             ->orderBy('products.created_at', 'DESC')
             ->take($limit)
             ->paginate($products_per_page);
+
+        /** @var Product $lastProduct */
+        foreach ($lastProducts as $lastProduct) {
+            $lastProduct->price = $lastProduct->getPrice($currency_class)->getPriceWithSymbol();
+        } //TODO: fix this ugly foreach ;-p
 
         return $lastProducts;
     }

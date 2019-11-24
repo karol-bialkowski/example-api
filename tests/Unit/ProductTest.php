@@ -45,7 +45,7 @@ class ProductTest extends TestCase
     {
         // Given
         $expect_price = '1,33 zł';
-        $calculated_eur_price = '0,31 €';
+        $calculated_eur_price = '0.31 €';
 
         /** @var Product $product */
         $product = factory(Product::class)->create();
