@@ -7,7 +7,9 @@ namespace App;
 use App\Exceptions\ProductException;
 use App\Models\Traits\UseUuid;
 use App\Money\Currency;
+use App\Money\Currency\Pln;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -26,26 +28,34 @@ class Product extends Model
      */
     public static function byId(string $uuid): self
     {
-        if(self::find($uuid)) {
+        if (self::find($uuid)) {
             return self::find($uuid);
         }
         throw ProductException::notFound($uuid);
     }
 
     /**
-     * @param bool $active
+     * @return HasMany
+     */
+    public function getPrices(): HasMany
+    {
+        return $this->hasMany(ProductPrice::class, 'product_id', 'id');
+    }
+
+    /**
+     * @param string $currency
      * @return Currency|null
      */
-    public function getPrice($active = true): ?Currency
+    public function getPrice($currency = Pln::class): ?Currency
     {
         $price = $this->hasMany(ProductPrice::class, 'product_id', 'id')
-            ->where('active', $active)->first();
+            ->where('active', true)->first();
 
-        if (null !== $price) {
-            return $price->getValue();
+        if ($price === null) {
+            return null;
         }
 
-        return null;
+        return $price->getValue($currency);
     }
 
 

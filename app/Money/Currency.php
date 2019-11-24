@@ -34,6 +34,14 @@ class Currency
     }
 
     /**
+     * @return float
+     */
+    public function getRawPrice(): float
+    {
+        return $this->money->getPriceAsFractionalUnits();
+    }
+
+    /**
      * @param string $price
      * @param string $placement
      * @param string $symbol

@@ -6,6 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ProductException;
 use App\Http\Requests\ApiCreateProductRequest;
+use App\Http\Requests\ApiUpdateProductRequest;
+use App\Money\Currency\Eur;
+use App\Money\Currency\Pln;
 use App\Product;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
@@ -37,8 +40,19 @@ class ProductController extends Controller
             $product = Product::byId($product_uuid);
             $response = [
                 'status' => true,
-                'payload' => $product
-            ];
+                'payload' => [
+                    'product' => $product,
+                    'price' => [
+                        [
+                            'currency' => [
+                                'PLN' => $product->getPrice(Pln::class)->getPriceWithSymbol(),
+                                'EUR' => $product->getPrice(Eur::class)->getPriceWithSymbol(),
+                            ],
+                            'raw' => $product->getPrice()->getRawPrice()
+                        ]
+                    ]
+                ]
+            ]; //TODO: move this array to separate product and price representations
             $code = Response::HTTP_OK;
 
         } catch (ProductException $exception) {
@@ -83,6 +97,25 @@ class ProductController extends Controller
     {
         try {
             ProductService::deleteProduct($product_uuid);
+            $response = [
+                'status' => true,
+            ];
+            $code = Response::HTTP_OK;
+        } catch (ProductException $exception) {
+            $response = [
+                'status' => false,
+                'message' => $exception->getMessage()
+            ];
+            $code = Response::HTTP_NOT_FOUND;
+        } finally {
+            return new JsonResponse($response, $code);
+        }
+    }
+
+    public function update(string $product_uuid, ApiUpdateProductRequest $apiUpdateProductRequest)
+    {
+        try {
+            ProductService::updateProduct($product_uuid, $apiUpdateProductRequest->validated());
             $response = [
                 'status' => true,
             ];

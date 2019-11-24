@@ -63,4 +63,42 @@ class ProductService extends Product
         return true;
     }
 
+    /**
+     * @param Product $product
+     * @return bool
+     */
+    public static function archivePrices(Product $product)
+    {
+        foreach($product->getPrices()->get() as $price) {
+            $price->update(['active' => 0]);
+        }
+
+        return true;
+    }
+
+    public static function updateProduct(string $product_uuid, array $validated)
+    {
+        DB::beginTransaction();
+
+        /** @var Product $product */
+        $product = Product::find($product_uuid);
+        if (null === $product) {
+            DB::rollback();
+            throw ProductException::notFound($product_uuid);
+        }
+
+        $product->update([
+            'name' => $validated['name']
+        ]);
+        self::archivePrices($product);
+
+        ProductPrice::create([
+            'value' => $validated['price'],
+            'active' => true,
+            'product_id' => $product_uuid
+        ]);
+
+        DB::commit();
+    }
+
 }

@@ -15,7 +15,7 @@ class Eur implements CurrencyInterface
     private const SYMBOL_PLACEMENT = 'after';
     private const value = 0.23273;
     private const DECIMAL = 2;
-    private const DECIMAl_SEPARATOR = ',';
+    private const DECIMAl_SEPARATOR = '.';
     private const THOUSANDS_SEPARATOR = '';
 
     /**
