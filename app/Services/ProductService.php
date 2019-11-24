@@ -69,7 +69,7 @@ class ProductService extends Product
      */
     public static function archivePrices(Product $product)
     {
-        foreach($product->getPrices()->get() as $price) {
+        foreach ($product->getPrices()->get() as $price) {
             $price->update(['active' => 0]);
         }
 
@@ -101,6 +101,22 @@ class ProductService extends Product
         DB::commit();
 
         return $product;
+    }
+
+    /**
+     * @param int $limit
+     * @param int $products_per_page
+     * @return mixed
+     */
+    public static function getLastProducts($limit = 5, $products_per_page = 3)
+    {
+        $lastProducts = Product::select(['products.*'])
+            ->with(['getPrices'])
+            ->orderBy('products.created_at', 'DESC')
+            ->take($limit)
+            ->paginate($products_per_page);
+
+        return $lastProducts;
     }
 
 }

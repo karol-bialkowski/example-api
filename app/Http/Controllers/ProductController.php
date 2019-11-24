@@ -105,4 +105,15 @@ class ProductController extends Controller
             return $response->getRepresentation();
         }
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function lastProducts(): JsonResponse
+    {
+        $lastProducts = ProductService::getLastProducts();
+        $api_response = new ApiRepresentation([$lastProducts], true, Response::HTTP_OK);
+
+        return $api_response->getRepresentation();
+    }
 }
