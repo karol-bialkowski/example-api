@@ -13,7 +13,10 @@ Route::group(['prefix' => 'products'], function () {
 });
 
 Route::group(['prefix' => 'carts'], function () {
+    Route::get('/{cart_uuid}', 'CartController@index');
     Route::post('/', 'CartController@create');
+    Route::delete('/', 'CartController@delete');
+    Route::post('/assign-products', 'CartController@assignProducts');
 });
 
 
