@@ -76,7 +76,7 @@ class ProductService extends Product
         return true;
     }
 
-    public static function updateProduct(string $product_uuid, array $validated)
+    public static function updateProduct(string $product_uuid, array $validated): Product
     {
         DB::beginTransaction();
 
@@ -99,6 +99,8 @@ class ProductService extends Product
         ]);
 
         DB::commit();
+
+        return $product;
     }
 
 }

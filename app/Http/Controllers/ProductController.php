@@ -7,8 +7,8 @@ namespace App\Http\Controllers;
 use App\Exceptions\ProductException;
 use App\Http\Requests\ApiCreateProductRequest;
 use App\Http\Requests\ApiUpdateProductRequest;
-use App\Money\Currency\Eur;
-use App\Money\Currency\Pln;
+use App\Logic\ApiRepresentation;
+use App\Logic\ProductRepresentation;
 use App\Product;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
@@ -38,31 +38,14 @@ class ProductController extends Controller
 
             /** @var Product $product */
             $product = Product::byId($product_uuid);
-            $response = [
-                'status' => true,
-                'payload' => [
-                    'product' => $product,
-                    'price' => [
-                        [
-                            'currency' => [
-                                'PLN' => $product->getPrice(Pln::class)->getPriceWithSymbol(),
-                                'EUR' => $product->getPrice(Eur::class)->getPriceWithSymbol(),
-                            ],
-                            'raw' => $product->getPrice()->getRawPrice()
-                        ]
-                    ]
-                ]
-            ]; //TODO: move this array to separate product and price representations
-            $code = Response::HTTP_OK;
+
+            $productRepresentation = new ProductRepresentation($product);
+            $response = new ApiRepresentation($productRepresentation->getArrayRepresentation(), true, Response::HTTP_OK);
 
         } catch (ProductException $exception) {
-            $response = [
-                'status' => false,
-                'message' => $exception->getMessage()
-            ];
-            $code = Response::HTTP_NOT_FOUND;
+            $response = new ApiRepresentation([], false, Response::HTTP_NOT_FOUND, $exception->getMessage());
         } finally {
-            return new JsonResponse($response, $code);
+            return $response->getRepresentation();
         }
     }
 
@@ -76,16 +59,15 @@ class ProductController extends Controller
         $create = ProductService::createProduct($apiCreateProductRequest);
 
         if (null === $create) {
-            return new JsonResponse([
-                'status' => false,
-                'message' => 'An error occurred. Probably your request is not correct.'
-            ], Response::HTTP_BAD_REQUEST);
+            $response = new ApiRepresentation([], false, Response::HTTP_BAD_REQUEST, 'An error occurred. Probably your request is not correct.');
+
+            return $response->getRepresentation();
         }
 
-        return new JsonResponse([
-            'status' => true,
-            'payload' => $create
-        ], Response::HTTP_OK);
+        $productRepresentation = new ProductRepresentation($create);
+        $response = new ApiRepresentation($productRepresentation->getArrayRepresentation(), true, Response::HTTP_OK);
+
+        return $response->getRepresentation();
     }
 
     /**
@@ -97,37 +79,30 @@ class ProductController extends Controller
     {
         try {
             ProductService::deleteProduct($product_uuid);
-            $response = [
-                'status' => true,
-            ];
-            $code = Response::HTTP_OK;
+            $response = new ApiRepresentation([], true, Response::HTTP_OK);
         } catch (ProductException $exception) {
-            $response = [
-                'status' => false,
-                'message' => $exception->getMessage()
-            ];
-            $code = Response::HTTP_NOT_FOUND;
+            $response = new ApiRepresentation([], false, Response::HTTP_NOT_FOUND, $exception->getMessage());
         } finally {
-            return new JsonResponse($response, $code);
+            return $response->getRepresentation();
         }
     }
 
+    /**
+     * @param string $product_uuid
+     * @param ApiUpdateProductRequest $apiUpdateProductRequest
+     * @return JsonResponse
+     */
     public function update(string $product_uuid, ApiUpdateProductRequest $apiUpdateProductRequest)
     {
         try {
-            ProductService::updateProduct($product_uuid, $apiUpdateProductRequest->validated());
-            $response = [
-                'status' => true,
-            ];
-            $code = Response::HTTP_OK;
+            $product = ProductService::updateProduct($product_uuid, $apiUpdateProductRequest->validated());
+            $productRepresentation = new ProductRepresentation($product);
+            $response = new ApiRepresentation($productRepresentation->getArrayRepresentation(), true, Response::HTTP_OK);
+
         } catch (ProductException $exception) {
-            $response = [
-                'status' => false,
-                'message' => $exception->getMessage()
-            ];
-            $code = Response::HTTP_NOT_FOUND;
+            $response = new ApiRepresentation([], false, Response::HTTP_NOT_FOUND, $exception->getMessage());
         } finally {
-            return new JsonResponse($response, $code);
+            return $response->getRepresentation();
         }
     }
 }
