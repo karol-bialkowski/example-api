@@ -13,6 +13,8 @@
 
 use App\Product;
 
+//Route::get('/products', 'ProductController@index');
+
 Route::get('/', function () {
 
     $fractionalPrice = 100;
