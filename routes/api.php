@@ -10,7 +10,10 @@ Route::group(['prefix' => 'products'], function () {
     Route::get('/{product_uuid}', 'ProductController@product');
     Route::delete('/{product_uuid}', 'ProductController@delete');
     Route::put('/{product_uuid}', 'ProductController@update');
+});
 
+Route::group(['prefix' => 'carts'], function () {
+    Route::post('/', 'CartController@create');
 });
 
 
