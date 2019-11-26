@@ -1,72 +1,366 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+### Features
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+- create, update and remove products with prices
+- support currencies ( now is only PLN and EUR )
+- create cart and assign new products
 
-## About Laravel
+### TODO
+- JWT authorization
+- RabbitMQ as queue
+- Swagger as beautiful api docs
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Docs
+This is simple, example REST API. Let`s get started!
 
-## Learning Laravel
+All endpoints use `/api` as prefix. Api require only headers **Content-Type: application/json** and send content as json.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+You shoud use specific end-points, details below:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
+### create product
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+`POST example.com/api/products`
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
+```
+{
+    "name": "Example Product",
+    "price": "1002"
+}
+```
 
-## Contributing
+**Example response**
+```
+{
+    "status": true,
+    "payload": {
+        "product": {
+            "name": "Example Product",
+            "id": "14fd0b08-d4a0-47d1-83e3-59c653d49290",
+            "updated_at": "2019-11-26 20:44:34",
+            "created_at": "2019-11-26 20:44:34"
+        },
+        "price": [
+            {
+                "currency": {
+                    "PLN": "10,02 zł",
+                    "EUR": "2.33 €"
+                },
+                "raw": 1002
+            }
+        ]
+    }
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Security Vulnerabilities
+### update product
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+`PUT example.com/api/products/{product_uuid}`
 
-## License
+```
+{
+    "name": "Name to change",
+    "price": "500"
+}
+```
 
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Example of not found response**
+```
+{
+    "status": false,
+    "payload": [],
+    "message": "Not found product with uuid: Ananasy"
+}
+```
+
+**Example response**
+```
+{
+    "status": true,
+    "payload": {
+        "product": {
+            "id": "14fd0b08-d4a0-47d1-83e3-59c653d49290",
+            "name": "Mario Forever1133",
+            "created_at": "2019-11-26 20:44:34",
+            "updated_at": "2019-11-26 21:00:00"
+        },
+        "price": [
+            {
+                "currency": {
+                    "PLN": "100,03 zł",
+                    "EUR": "23.28 €"
+                },
+                "raw": 10003
+            }
+        ]
+    }
+}
+```
+
+
+
+### last products, with paginate
+
+`GET example.com/api/products/last`
+
+```
+without content :)
+```
+
+**Example response**
+```
+{
+    "status": true,
+    "payload": [
+        {
+            "current_page": 1,
+            "data": [
+                {
+                    "id": "14fd0b08-d4a0-47d1-83e3-59c653d49290",
+                    "name": "Mario Forever1133",
+                    "created_at": "2019-11-26 20:44:34",
+                    "updated_at": "2019-11-26 21:00:00",
+                    "price": "100,03 zł"
+                },
+                {
+                    "id": "2fded9e0-e43c-400e-8895-28f022bc88e5",
+                    "name": "Mari22o22",
+                    "created_at": "2019-11-24 15:20:42",
+                    "updated_at": "2019-11-24 15:20:42",
+                    "price": "10,02 zł"
+                },
+                {
+                    "id": "cce47ece-fb4b-4688-936f-22aca7ab2fe7",
+                    "name": "Mari22o2",
+                    "created_at": "2019-11-24 15:20:28",
+                    "updated_at": "2019-11-24 15:20:28",
+                    "price": "10,02 zł"
+                }
+            ],
+            "first_page_url": "http://bialkowski.test/api/products/last?page=1",
+            "from": 1,
+            "last_page": 3,
+            "last_page_url": "http://bialkowski.test/api/products/last?page=3",
+            "next_page_url": "http://bialkowski.test/api/products/last?page=2",
+            "path": "http://bialkowski.test/api/products/last",
+            "per_page": 3,
+            "prev_page_url": null,
+            "to": 3,
+            "total": 8
+        }
+    ]
+}
+```
+
+
+
+### create cart
+
+`POST example.com/api/carts`
+
+```
+without content :)
+```
+
+**Example response**
+```
+{
+    "status": true,
+    "payload": {
+        "cart": {
+            "id": "b0b53ac0-5562-4b57-8492-06f362886ec0",
+            "expire_at": {
+                "date": "2019-11-26 23:05:15.179778",
+                "timezone_type": 3,
+                "timezone": "UTC"
+            },
+            "updated_at": "2019-11-26 21:05:15",
+            "created_at": "2019-11-26 21:05:15"
+        }
+    }
+}
+```
+
+
+
+### assign product to cart
+
+`POST example.com/api/carts`
+
+```
+{
+	"cart_id": "0c3099b9-a2b5-4d39-86b4-cfde9be16e80",
+	"products": [
+		"c7649d42-fcff-47bd-8f52-72f97dfe3668"
+	]
+}
+```
+
+**Example error response**
+
+```
+{
+    "status": false,
+    "payload": [],
+    "message": "You can`t assign product: c7649d42-fcff-47bd-8f52-72f97dfe3668 - this products is exist in this cart."
+}
+```
+
+**Example response**
+```
+{
+    "status": true,
+    "payload": {
+        "cart": {
+            "id": "b0b53ac0-5562-4b57-8492-06f362886ec0",
+            "expire_at": "2019-11-26 23:05:15",
+            "created_at": "2019-11-26 21:05:15",
+            "updated_at": "2019-11-26 21:05:15"
+        },
+        "cart_products": [
+            {
+                "id": 10,
+                "product_id": "c7649d42-fcff-47bd-8f52-72f97dfe3668",
+                "cart_id": "b0b53ac0-5562-4b57-8492-06f362886ec0",
+                "created_at": "2019-11-26 21:08:20",
+                "updated_at": "2019-11-26 21:08:20"
+            }
+        ]
+    }
+}
+```
+
+
+
+### delete product from cart
+
+`DELETE example.com/api/carts`
+
+```
+{
+	"cart_uuid": "0c3099b9-a2b5-4d39-86b4-cfde9be16e80",
+	"product_uuid": "9df42478-0b82-4ef8-8e37-6c329c2267c8"
+}
+```
+
+**Example of error**
+```
+{
+    "status": false,
+    "errors": {
+        "product_uuid": [
+            "The selected product uuid is invalid."
+        ]
+    }
+}
+```
+
+**Example response**
+```
+{
+    "status": true,
+    "payload": {
+        "cart": {
+            "id": "b0b53ac0-5562-4b57-8492-06f362886ec0",
+            "expire_at": "2019-11-26 23:05:15",
+            "created_at": "2019-11-26 21:05:15",
+            "updated_at": "2019-11-26 21:05:15"
+        }
+    }
+}
+```
+
+
+
+
+
+### summary of cart
+
+`GET example.com/api/carts/{cart_uuid}`
+
+```
+without content :-(
+```
+
+**Example response**
+```
+{
+    "status": true,
+    "payload": {
+        "cart": {
+            "id": "0c3099b9-a2b5-4d39-86b4-cfde9be16e80",
+            "expire_at": "2019-11-24 20:08:08",
+            "created_at": "2019-11-24 18:08:08",
+            "updated_at": "2019-11-24 18:08:08"
+        },
+        "cart_products": {
+            "0": {
+                "product": {
+                    "product": {
+                        "id": "d0d86460-d95a-4abe-a72e-ac9de2389f04",
+                        "name": "Karolowy-1235",
+                        "created_at": "2019-11-24 13:04:20",
+                        "updated_at": "2019-11-24 13:04:20"
+                    },
+                    "price": [
+                        {
+                            "currency": {
+                                "PLN": "99,09 zł",
+                                "EUR": "23.06 €"
+                            },
+                            "raw": 9909
+                        }
+                    ]
+                }
+            },
+            "1": {
+                "product": {
+                    "product": {
+                        "id": "c7649d42-fcff-47bd-8f52-72f97dfe3668",
+                        "name": "Mario",
+                        "created_at": "2019-11-24 15:09:27",
+                        "updated_at": "2019-11-24 15:09:27"
+                    },
+                    "price": [
+                        {
+                            "currency": {
+                                "PLN": "1,00 zł",
+                                "EUR": "0.23 €"
+                            },
+                            "raw": 100
+                        }
+                    ]
+                }
+            },
+            "summary": {
+                "PLN": "100,09 zł",
+                "EUR": "23.29 €"
+            }
+        }
+    }
+}
+```
+
+
+### Routes
+
+```
+Route::group(['prefix' => 'products'], function () {
+    Route::get('/last', 'ProductController@lastProducts');
+
+    Route::get('/', 'ProductController@index');
+    Route::post('/', 'ProductController@create');
+    Route::get('/{product_uuid}', 'ProductController@product');
+    Route::delete('/{product_uuid}', 'ProductController@delete');
+    Route::put('/{product_uuid}', 'ProductController@update');
+});
+
+Route::group(['prefix' => 'carts'], function () {
+    Route::get('/{cart_uuid}', 'CartController@index');
+    Route::post('/', 'CartController@create');
+    Route::delete('/', 'CartController@delete');
+    Route::post('/assign-products', 'CartController@assignProducts');
+});
+```
